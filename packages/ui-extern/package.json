@@ -1,0 +1,29 @@
+{
+  "name": "ui-extern",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup index.ts --format esm --dts",
+    "dev": "concurrently \"pnpm run dev:compile\" \"pnpm run dev:dts\"",
+    "dev:compile": "tsup index.ts --format esm --watch",
+    "dev:dts": "tsc --emitDeclarationOnly --declaration --watch",
+    "lint": "eslint \"**/*.ts*\""
+  },
+  "devDependencies": {
+    "@types/react": "18.2.14",
+    "@types/react-dom": "18.2.6",
+    "concurrently": "8.2.0",
+    "eslint": "8.44.0",
+    "eslint-config-custom": "workspace:*",
+    "react": "18.2.0",
+    "tsconfig": "workspace:*",
+    "tsup": "7.1.0",
+    "typescript": "5.1.6"
+  },
+  "peerDependencies": {
+    "next": "13.4.8"
+  }
+}

@@ -4,6 +4,7 @@ export const Header = ({ text }: { text: string }) => {
   return (
     <div>
       <h1>{text}</h1>
+      {/* This would work if instead it was `<Image.default` (ignoring the TS issue) */}
       <Image
         alt="Example"
         height={300}

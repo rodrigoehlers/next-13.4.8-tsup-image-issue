@@ -1,81 +1,40 @@
-# Turborepo starter
+# next-13.4.8-tsup-image-issue
 
-This is an official starter Turborepo.
+This is a reproduction repo for an issue with `next@13.4.8` and a ui library built with `tsup@7.1.0` that uses `import Image from 'next/image'` and renders it.
 
-## Using this example
+## Steps to reproduce
 
-Run the following command:
+To reproduce, clone the repo, install the dependencies with `pnpm i` (this is a pnpm monorepo) and run `pnpm dev`.
 
-```sh
-npx create-turbo@latest
-```
+Navigate to `http://localhost:3000`. You will see a working page that renders an image and some other components. This is using the `ui` library under `packages/ui`. This library is transpiled by Next.js itself.
 
-## What's inside?
+Now navigate to `http://localhost:3000/extern`. You will see that the page breaks. This is now using a library `ui-extern` (found at `packages/ui-extern`) that is built externally using `tsup` and is just consumed by the Next.js app.
 
-This Turborepo includes the following packages/apps:
+## Expected behavior
 
-### Apps and Packages
+Both routes should render without issues.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
+## Context
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+For context, this bug seems to come up since [`next@13.4.8-canary.9`](https://github.com/vercel/next.js/releases/tag/v13.4.8-canary.9), specifically with [this MR](https://github.com/vercel/next.js/pull/51205).
 
-### Utilities
+When debugging the external component, it seemed as if the imported `Image` is not a React component but an object containing two keys: `default` and `unstable_getImgProps`. When rendereing the `Image` like the following it does actually work.
 
-This Turborepo has some additional tools already setup for you:
+```tsx
+import Image from "next/image";
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
+export const Header = ({ text }: { text: string }) => {
+  return (
+    <div>
+      <h1>{text}</h1>
+      <Image.default
+        alt="Example"
+        height={300}
+        width={200}
+        src="https://fastly.picsum.photos/id/432/200/300.jpg?hmac=S0muAtaN6T0PXbBlf5O-UL0chTPM6i9FReOIs0IJlDU"
+      />
+    </div>
+  );
+};
 
 ```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
